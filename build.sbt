@@ -7,6 +7,7 @@ lazy val commonSettings = Seq(
   crossScalaVersions := Seq("2.11.12", "2.12.6"),
   crossVersion := CrossVersion.binary,
   scalacOptions --= ignoreScalacOptions(scalaVersion.value),
+  scalacOptions += "-language:experimental.macros",
   scalacOptions in (Compile, doc) += "-groups",
   libraryDependencies += Dependencies.scalatest,
   updateImpactOpenBrowser := false,
@@ -45,16 +46,6 @@ lazy val core = (project in file("core"))
     )
   )
 
-lazy val akka = (project in file("akka"))
-  .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
-  .settings(
-    name := s"$repo-akka",
-    description := "Reactive file watcher using Akka actors",
-    libraryDependencies += Dependencies.akka
-  )
-  .dependsOn(core % "test->test;compile->compile")
-
 lazy val root = (project in file("."))
   .settings(name := s"$repo-root")
   .settings(commonSettings: _*)
@@ -63,11 +54,11 @@ lazy val root = (project in file("."))
   .settings(releaseSettings: _*)
   .enablePlugins(ScalaUnidocPlugin)
   .enablePlugins(GhpagesPlugin)
-  .aggregate(core, akka)
+  .aggregate(core)
 
 lazy val docSettings = Seq(
   autoAPIMappings := true,
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(core, akka),
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inProjects(core),
   siteSourceDirectory := baseDirectory.value / "site",
   siteSubdirName in ScalaUnidoc := "latest/api",
   addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc),
